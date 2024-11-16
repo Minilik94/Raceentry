@@ -39,7 +39,7 @@
 		<Sidebar.Group class="space-y-8">
 			<Sidebar.GroupLabel>
 				<div class="mx-auto h-20 w-24">
-					<Logo/>
+					<Logo />
 				</div>
 			</Sidebar.GroupLabel>
 			<Sidebar.GroupContent>
@@ -61,20 +61,22 @@
 		<!-- Dropdown menu for additional options -->
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger
-				class="hover:bg-muted mx-auto flex w-full cursor-pointer items-center gap-1 rounded-md p-3 px-8 text-sm capitalize"
+				class="hover:bg-muted mx-auto flex w-full cursor-pointer items-center gap-1 rounded-md  p-3 px-8 text-sm capitalize"
 			>
 				<Menu />
 				<div class="ml-4 hidden md:inline-block">More</div>
 			</DropdownMenu.Trigger>
-			<DropdownMenu.Content class="w-full rounded-xl p-3 shadow-lg">
-				<DropdownMenu.Group>
-					<DropdownMenu.Item class="flex cursor-pointer items-center gap-2 p-3">
+			<DropdownMenu.Content class="min-w-sm w-[16rem] rounded-xl p-3 shadow-lg">
+				<DropdownMenu.Group class="w-full">
+					<DropdownMenu.Item class="flex w-full cursor-pointer items-center gap-2 p-3 ">
 						<SettingsIcon />
 						<a href="/">Settings</a>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item class="flex cursor-pointer items-center gap-2 p-3">
-						<UsersIcon /> Account
-					</DropdownMenu.Item>
+					<a href="/my/account">
+						<DropdownMenu.Item class="flex cursor-pointer items-center gap-2 p-3">
+							<UsersIcon /> Account
+						</DropdownMenu.Item></a
+					>
 					<DropdownMenu.Item class="flex cursor-pointer items-center gap-2 p-3">
 						<ReportsIcon /> Projects
 					</DropdownMenu.Item>

@@ -35,6 +35,9 @@ export const registerSchema = z
 			.trim(),
 		username: z
 			.string()
+			.regex(/^[a-zA-Z0-9_]+$/, {
+				message: 'Username can only contain letters, numbers, and underscores.'
+			})
 			.min(2, {
 				message: 'username must be at least 2 characters long'
 			})

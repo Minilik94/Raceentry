@@ -4,6 +4,7 @@
 	import AtomImg from '$lib/components/ui/Icons/electric_vehicle_cup.webp';
 	import Urban from '$lib/components/ui/Icons/mountain_peak_challenge.webp';
 	import Endurance from '$lib/components/ui/Icons/grand_prix_championship.jpg';
+	import type { User as UserTypes } from '$lib/types.ts';
 	import {
 		Calendar,
 		User,
@@ -27,7 +28,14 @@
 	} from 'lucide-svelte';
 	import { slide } from 'svelte/transition';
 
-	export let data;
+	// export let data;
+	let { data } = $props();
+
+	let currentUser: UserTypes = data.user;
+
+	$effect(() => {
+		currentUser;
+	});
 
 	console.log(data, 'from welcome page');
 
@@ -82,7 +90,6 @@
 		imageUrl: string;
 		url: string;
 	}
-
 	const userName = data?.user != undefined ? data.user?.name : 'john doe';
 	const userEmail = data?.user != undefined ? data.user?.email : 'john.doe@example.com';
 	const profileImageUrl = 'https://xsgames.co/randomusers/avatar.php?g=male';
@@ -269,10 +276,10 @@
 		<div class="mb-8 rounded-lg bg-white p-6 shadow-md">
 			<div class="mb-4 flex items-center justify-between">
 				<div class="flex items-center">
-					<img src={profileImageUrl} alt={userName} class="mr-4 h-16 w-16 rounded-full" />
+					<img src={profileImageUrl} alt={currentUser.name} class="mr-4 h-16 w-16 rounded-full" />
 					<div>
-						<h2 class="text-xl font-bold">{userName}</h2>
-						<p class="text-gray-600">{userEmail}</p>
+						<h2 class="text-xl font-bold">{currentUser.name}</h2>
+						<p class="text-gray-600">{currentUser.email}</p>
 					</div>
 				</div>
 				<a href="/edit-profile" class="btn bg-blue-500 text-white hover:bg-blue-600">
