@@ -3,7 +3,7 @@
 	import * as Card from '$lib/components/ui/card';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { Sun, Moon, Laptop, Mail, Shield, LogOut, Camera, Icon, Loader } from 'lucide-svelte';
+	import { Sun, Moon, Laptop, Mail, Shield, LogOut, Camera } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
@@ -11,15 +11,14 @@
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { updateProfileSchema, updateAccountSchema, updatePasswordSchema } from '$lib/schema.js';
 	import { superForm } from 'sveltekit-superforms';
-	import { getImageURL } from '$lib/utils.js';
+	import { getImageURL, hanldeSuperForm } from '$lib/utils.js';
 	import type { User as UserTypes } from '$lib/types';
 	import {
 		ChangeEmailAndUsername,
 		ChangeAvatarAndName,
-		DeleteAccount
+		DeleteAccount,
+		ChangePassword
 	} from '$lib/components/ui/account_details';
-	import * as Form from '$lib/components/ui/form';
-	import { Input } from '$lib/components/ui/input';
 
 	let {
 		data
@@ -71,35 +70,12 @@
 			if (form.message) {
 				if (form.message.type == 'error') {
 					toast.error(form.message.text);
-				} else  {
-					console.log(form.message.text, 'form message')
+				} else {
+					console.log(form.message.text, 'form message');
 					toast.success(form.message.text);
 				}
 			}
 		}
-	});
-
-	const {
-		enhance: enhanceAccount,
-		delayed: accountDelayed,
-		form: accountFormData,
-		message: accountMessage,
-		errors: accountErrors
-	} = accountForm;
-
-	const {
-		enhance: enhancePass,
-		delayed: delayedPass,
-		form: formPass,
-		message: messagePass,
-		errors: errorPass
-	} = passwordForm;
-
-	$accountFormData.email = data.user.email;
-	$accountFormData.username = data.user.username;
-
-	$effect(() => {
-		console.log($accountFormData.email, 'email', data.user.email);
 	});
 
 	const { enhance, form: formData, message } = form;
@@ -243,53 +219,7 @@
 					</Card.Root>
 				</Tabs.Content>
 				<Tabs.Content value="security">
-					<form action="?/updatePassword" method="POST" use:enhancePass>
-						<div class="grid gap-4">
-							<div class="grid gap-2">
-								<Form.Field form={passwordForm} name="currentPassword">
-									<Form.Control>
-										{#snippet children({ props })}
-											<Form.Label>CurrentPassword</Form.Label>
-											<Input {...props} type="password" bind:value={$formPass.currentPassword} />
-										{/snippet}
-									</Form.Control>
-									<Form.Description />
-									<Form.FieldErrors />
-								</Form.Field>
-							</div>
-							<div class="grid gap-2">
-								<Form.Field form={passwordForm} name="password">
-									<Form.Control>
-										{#snippet children({ props })}
-											<Form.Label>Password</Form.Label>
-											<Input {...props} type="password" bind:value={$formPass.password} />
-										{/snippet}
-									</Form.Control>
-									<Form.Description />
-									<Form.FieldErrors />
-								</Form.Field>
-							</div>
-							<div class="grid gap-2">
-								<Form.Field form={passwordForm} name="passwordConfirm">
-									<Form.Control>
-										{#snippet children({ props })}
-											<Form.Label>PasswordConfirm</Form.Label>
-											<Input {...props} type="password" bind:value={$formPass.passwordConfirm} />
-										{/snippet}
-									</Form.Control>
-									<Form.Description />
-									<Form.FieldErrors />
-								</Form.Field>
-							</div>
-							<Button type="submit" class="w-full">
-								{#if $delayedPass}
-									<Loader class="size-4 animate-spin" />
-								{:else}
-									Update
-								{/if}</Button
-							>
-						</div>
-					</form>
+					<ChangePassword {passwordForm} />
 				</Tabs.Content>
 				<Tabs.Content value="danger" class="space-y-6">
 					<DeleteAccount />
