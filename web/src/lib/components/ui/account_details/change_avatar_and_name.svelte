@@ -1,19 +1,45 @@
-<script>
+<script lang="ts">
+	import { createEventDispatcher } from 'svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Form from '$lib/components/ui/form';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import { enhance } from '$app/forms';
 	import { getImageURL } from '$lib/utils';
 	import { Loader } from 'lucide-svelte';
-    
+	import { toast } from 'svelte-sonner';
+
+	let { data, form, isOpen } = $props();
+
+	const dispatch = createEventDispatcher();
+
+	const { enhance, delayed, form: formData, message } = form;
+
+	let avatarPreview: string | null = $state(null);
+
+	const handleAvatarUpload = async (event: Event) => {
+		const file = (event.target as HTMLInputElement).files?.[0];
+		if (file) {
+			let reader = new FileReader();
+
+			reader.onload = (e) => {
+				avatarPreview = e.target?.result as string;
+				toast.success('Avatar preview updated');
+			};
+
+			reader.readAsDataURL(file);
+
+			$formData.avatar = file;
+		}
+	};
+
+	const handleProfileDialogChange = (open: boolean) => {
+		dispatch('profileDialogChange', { open });
+	};
 </script>
 
-
-
-<Dialog.Root bind:open={isProfileDialogOpen}>
+<Dialog.Root open={isOpen} onOpenChange={handleProfileDialogChange}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
 			<Dialog.Title>Update profile</Dialog.Title>
@@ -51,7 +77,6 @@
 									{...props}
 									placeholder={data.user.name}
 									type="text"
-									contenteditable="true"
 									bind:value={$formData.name}
 								/>
 							{/snippet}

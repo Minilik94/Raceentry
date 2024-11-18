@@ -1,34 +1,25 @@
 <script lang="ts">
+	import { createEventDispatcher } from 'svelte';
 	import * as Card from '$lib/components/ui/card';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import {
-		Sun,
-		Moon,
-		Laptop,
-		User,
-		Mail,
-		Shield,
-		LogOut,
-		Camera,
-		Icon,
-		Loader
-	} from 'lucide-svelte';
-	import { browser } from '$app/environment';
+	import { Sun, Moon, Laptop, Mail, Shield, LogOut, Camera, Icon, Loader } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import * as Dialog from '$lib/components/ui/dialog';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { validators } from 'tailwind-merge';
 	import { zodClient } from 'sveltekit-superforms/adapters';
-	import { updateProfileSchema } from '$lib/schema.js';
+	import { updateProfileSchema, updateAccountSchema, updatePasswordSchema } from '$lib/schema.js';
 	import { superForm } from 'sveltekit-superforms';
-	import * as Form from '$lib/components/ui/form';
 	import { getImageURL } from '$lib/utils.js';
 	import type { User as UserTypes } from '$lib/types';
+	import {
+		ChangeEmailAndUsername,
+		ChangeAvatarAndName,
+		DeleteAccount
+	} from '$lib/components/ui/account_details';
+	import * as Form from '$lib/components/ui/form';
+	import { Input } from '$lib/components/ui/input';
 
 	let {
 		data
@@ -36,6 +27,8 @@
 		data: {
 			user: UserTypes;
 			accountData: any;
+			profileData: any;
+			passwordData: any;
 		};
 	} = $props();
 
@@ -43,7 +36,8 @@
 	let username = $state('john doe');
 	let avatarUrl = $state('https://xsgames.co/randomusers/avatar.php?g=male');
 	let isProfileDialogOpen = $state(false);
-	let avatarPreview: string | null = $state(null);
+
+	const dispatch = createEventDispatcher();
 
 	const form = superForm(data.accountData, {
 		validators: zodClient(updateProfileSchema),
@@ -52,36 +46,66 @@
 				if (form.message.type == 'error') {
 					toast.error(form.message.text);
 				} else {
-					isProfileDialogOpen = false;
+					handleProfileDialogChange(false);
 					toast.success(form.message.text);
 				}
 			}
 		}
 	});
 
-	const { enhance, delayed, form: formData, message } = form;
-
-	const handleAvatarUpload = async (event: Event) => {
-		const file = (event.target as HTMLInputElement).files?.[0];
-		console.log(file);
-
-		if (file) {
-			let render = new FileReader();
-
-			render.onload = (e) => {
-				avatarPreview = e.target?.result as string;
-				toast.success('Profile updated successfuly');
-			};
-
-			render.readAsDataURL(file);
-
-			$formData.avatar = file;
+	const accountForm = superForm(data.profileData, {
+		validators: zodClient(updateAccountSchema),
+		onUpdated: ({ form }) => {
+			if (form.message) {
+				if (form.message.type == 'error') {
+					toast.error(form.message.text);
+				} else {
+					toast.success(form.message.text);
+				}
+			}
 		}
-	};
+	});
+	const passwordForm = superForm(data.passwordData, {
+		validators: zodClient(updatePasswordSchema),
+		onUpdated: ({ form }) => {
+			if (form.message) {
+				if (form.message.type == 'error') {
+					toast.error(form.message.text);
+				} else  {
+					console.log(form.message.text, 'form message')
+					toast.success(form.message.text);
+				}
+			}
+		}
+	});
+
+	const {
+		enhance: enhanceAccount,
+		delayed: accountDelayed,
+		form: accountFormData,
+		message: accountMessage,
+		errors: accountErrors
+	} = accountForm;
+
+	const {
+		enhance: enhancePass,
+		delayed: delayedPass,
+		form: formPass,
+		message: messagePass,
+		errors: errorPass
+	} = passwordForm;
+
+	$accountFormData.email = data.user.email;
+	$accountFormData.username = data.user.username;
+
+	$effect(() => {
+		console.log($accountFormData.email, 'email', data.user.email);
+	});
+
+	const { enhance, form: formData, message } = form;
 
 	$effect(() => {
 		applyTheme(theme);
-		theme;
 	});
 
 	onMount(() => {
@@ -106,22 +130,28 @@
 		theme = newTheme;
 		applyTheme(newTheme);
 		toast.success(`Theme set to ${newTheme} mode`);
+		localStorage.setItem('theme', theme);
 	}
 
 	$formData.name = data.user.name;
 
 	$effect(() => {
 		if ($message?.type && $message?.type === 'success') {
-			isProfileDialogOpen = false;
+			handleProfileDialogChange(false);
 		}
 	});
+
+	function handleProfileDialogChange(open: boolean) {
+		isProfileDialogOpen = open;
+		dispatch('profileDialogChange', { open });
+	}
 </script>
 
 <div class="mx-auto max-w-4xl p-3">
 	<Card.Root class="bg-background">
 		<Card.Header class="flex flex-row items-center justify-between">
 			<div>
-				<Card.Title class="text-3xl font-bold">Account Settings</Card.Title>
+				<Card.Title class="text-3xl font-bold">Settings</Card.Title>
 				<Card.Description>Manage your account information and preferences</Card.Description>
 			</div>
 			<DropdownMenu.Root>
@@ -167,7 +197,7 @@
 					</Avatar.Root>
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<div
-						onclick={() => (isProfileDialogOpen = true)}
+						onclick={() => handleProfileDialogChange(true)}
 						class="bg-primary text-primary-foreground hover:bg-primary/90 absolute bottom-0 right-0 cursor-pointer rounded-full p-2 transition-colors"
 					>
 						<Camera class="h-4 w-4" />
@@ -181,91 +211,97 @@
 			<div class="my-8 flex w-full justify-end">
 				<Button
 					class="flex w-fit justify-end rounded-sm p-4 shadow"
-					onclick={() => (isProfileDialogOpen = true)}
+					onclick={() => handleProfileDialogChange(true)}
 				>
 					Change Profile
 				</Button>
 			</div>
-			<Tabs.Root class="w-full">
+			<Tabs.Root class="w-full" value="account">
 				<Tabs.List class="mx-auto grid w-full grid-cols-3 ">
 					<Tabs.Trigger value="account" class="data-[state=active]:bg-muted">
 						<Mail class="mr-2 h-4 w-4" />
-						Account</Tabs.Trigger
-					>
+						Account
+					</Tabs.Trigger>
 					<Tabs.Trigger value="security" class="data-[state=active]:bg-muted">
 						<Shield class="mr-2 h-4 w-4" />
-						Security</Tabs.Trigger
-					>
+						Security
+					</Tabs.Trigger>
 					<Tabs.Trigger value="danger" class="data-[state=active]:bg-muted">
 						<LogOut class="mr-2 h-4 w-4" />
-						Danger</Tabs.Trigger
-					>
+						Danger
+					</Tabs.Trigger>
 				</Tabs.List>
-				<Tabs.Content value="account">Make changes to your account here.</Tabs.Content>
-				<Tabs.Content value="security">Change your password here.</Tabs.Content>
+				<Tabs.Content value="account">
+					<Card.Root>
+						<Card.Header>
+							<Card.Title>Account Details</Card.Title>
+							<Card.Description>you can update your email and username here</Card.Description>
+						</Card.Header>
+						<Card.Content>
+							<ChangeEmailAndUsername {data} {accountForm} />
+						</Card.Content>
+					</Card.Root>
+				</Tabs.Content>
+				<Tabs.Content value="security">
+					<form action="?/updatePassword" method="POST" use:enhancePass>
+						<div class="grid gap-4">
+							<div class="grid gap-2">
+								<Form.Field form={passwordForm} name="currentPassword">
+									<Form.Control>
+										{#snippet children({ props })}
+											<Form.Label>CurrentPassword</Form.Label>
+											<Input {...props} type="password" bind:value={$formPass.currentPassword} />
+										{/snippet}
+									</Form.Control>
+									<Form.Description />
+									<Form.FieldErrors />
+								</Form.Field>
+							</div>
+							<div class="grid gap-2">
+								<Form.Field form={passwordForm} name="password">
+									<Form.Control>
+										{#snippet children({ props })}
+											<Form.Label>Password</Form.Label>
+											<Input {...props} type="password" bind:value={$formPass.password} />
+										{/snippet}
+									</Form.Control>
+									<Form.Description />
+									<Form.FieldErrors />
+								</Form.Field>
+							</div>
+							<div class="grid gap-2">
+								<Form.Field form={passwordForm} name="passwordConfirm">
+									<Form.Control>
+										{#snippet children({ props })}
+											<Form.Label>PasswordConfirm</Form.Label>
+											<Input {...props} type="password" bind:value={$formPass.passwordConfirm} />
+										{/snippet}
+									</Form.Control>
+									<Form.Description />
+									<Form.FieldErrors />
+								</Form.Field>
+							</div>
+							<Button type="submit" class="w-full">
+								{#if $delayedPass}
+									<Loader class="size-4 animate-spin" />
+								{:else}
+									Update
+								{/if}</Button
+							>
+						</div>
+					</form>
+				</Tabs.Content>
+				<Tabs.Content value="danger" class="space-y-6">
+					<DeleteAccount />
+				</Tabs.Content>
 			</Tabs.Root>
 		</Card.Content>
 	</Card.Root>
 </div>
 
-
-
-<Dialog.Root bind:open={isProfileDialogOpen}>
-	<Dialog.Content class="sm:max-w-[425px]">
-		<Dialog.Header>
-			<Dialog.Title>Update profile</Dialog.Title>
-			<Dialog.Description>Update name and avatar</Dialog.Description>
-		</Dialog.Header>
-		<form action="?/updateProfile" enctype="multipart/form-data" method="post" use:enhance>
-			<div class="relative flex flex-col gap-4">
-				<Avatar.Root class="h-32 w-32">
-					<Avatar.Image
-						src={avatarPreview ||
-							(data.user.avatar &&
-								getImageURL(data.user.collectionId, data.user.id, data.user.avatar))}
-						alt="Avatar Preview"
-					/>
-					<Avatar.Fallback>{data.user.name.charAt(0)}</Avatar.Fallback>
-				</Avatar.Root>
-				<Label for="new-avatar" class="absolute h-32 w-32 cursor-pointer">
-					<Input
-						id="new-avatar"
-						name="avatar"
-						type="file"
-						accept="image/*"
-						onchange={handleAvatarUpload}
-						class="h-100 w-100 hidden cursor-pointer"
-					/>
-				</Label>
-			</div>
-			<div class="space-y-4">
-				<div class="grid gap-2">
-					<Form.Field {form} name="name">
-						<Form.Control>
-							{#snippet children({ props })}
-								<Form.Label>Name</Form.Label>
-								<Input
-									{...props}
-									placeholder={data.user.name}
-									type="text"
-									contenteditable="true"
-									bind:value={$formData.name}
-								/>
-							{/snippet}
-						</Form.Control>
-						<Form.Description />
-						<Form.FieldErrors />
-					</Form.Field>
-				</div>
-			</div>
-
-			<div class="flex justify-end">
-				{#if $delayed}
-					<Loader class="size-4 animate-spin" />
-				{:else}
-					<Button type="submit">Change Profile</Button>
-				{/if}
-			</div>
-		</form>
-	</Dialog.Content>
-</Dialog.Root>
+<ChangeAvatarAndName
+	{data}
+	{form}
+	isOpen={isProfileDialogOpen}
+	on:profileDialogChange={({ detail }) => handleProfileDialogChange(detail.open)}
+/>

@@ -109,3 +109,63 @@ export const updateProfileSchema = z.object({
 			}
 		})
 });
+
+export const updateAccountSchema = z.object({
+	email: z
+		.string({ required_error: 'Email is required' })
+		.regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, {
+			message: 'Please enter a valid email'
+		})
+		.min(1, { message: 'Email is required' })
+		.max(64, { message: 'Email must be 64 characters or less' })
+		.trim(),
+
+	username: z
+		.string()
+		.regex(/^[a-zA-Z0-9_]+$/, {
+			message: 'Username can only contain letters, numbers, and underscores.'
+		})
+		.min(2, {
+			message: 'username must be at least 2 characters long'
+		})
+		.max(50, {
+			message: 'Name must be less than 50 characters'
+		})
+		.trim()
+});
+
+export const updatePasswordSchema = z
+	.object({
+		currentPassword: z
+			.string({ required_error: 'current password is required' })
+			.regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
+				message:
+					'Password must be a minimum of 8 characters & contain at least one letter, one number, and one special character.'
+			}),
+		password: z
+			.string({ required_error: 'Password is required' })
+			.regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
+				message:
+					'Password must be a minimum of 8 characters & contain at least one letter, one number, and one special character.'
+			}),
+		passwordConfirm: z
+			.string({ required_error: 'Password confirm is required' })
+			.regex(/^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/, {
+				message:
+					'Password must be a minimum of 8 characters & contain at least one letter, one number, and one special character.'
+			})
+	})
+	.superRefine(({ passwordConfirm, password }, ctx) => {
+		if (passwordConfirm !== password) {
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'Password & Confirm password must match',
+				path: ['password']
+			});
+			ctx.addIssue({
+				code: z.ZodIssueCode.custom,
+				message: 'Password & Confirm password must match',
+				path: ['passwordConfirm']
+			});
+		}
+	});

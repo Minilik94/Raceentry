@@ -37,7 +37,6 @@
 		currentUser;
 	});
 
-	console.log(data, 'from welcome page');
 
 	interface Race {
 		id: number;
