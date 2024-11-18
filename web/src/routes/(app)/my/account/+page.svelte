@@ -1,221 +1,271 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	import { fade, fly, scale } from 'svelte/transition';
-	import { Button } from '$lib/components/ui/button';
-	import { Input } from '$lib/components/ui/input';
-	import { Label } from '$lib/components/ui/label';
 	import * as Card from '$lib/components/ui/card';
-	import { Separator } from '$lib/components/ui/separator';
-	import * as Dialog from '$lib/components/ui/dialog';
+	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
+	import { Button } from '$lib/components/ui/button';
+	import {
+		Sun,
+		Moon,
+		Laptop,
+		User,
+		Mail,
+		Shield,
+		LogOut,
+		Camera,
+		Icon,
+		Loader
+	} from 'lucide-svelte';
+	import { browser } from '$app/environment';
 	import * as Tabs from '$lib/components/ui/tabs';
+	import { onMount } from 'svelte';
+	import { toast } from 'svelte-sonner';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import { Camera, Moon, Sun, User, Mail, Shield, Bell, Key, Smartphone } from 'lucide-svelte';
-	import { Toaster, toast } from 'svelte-sonner';
+	import * as Dialog from '$lib/components/ui/dialog';
+	import { Input } from '$lib/components/ui/input/index.js';
+	import { Label } from '$lib/components/ui/label/index.js';
+	import { validators } from 'tailwind-merge';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { updateProfileSchema } from '$lib/schema.js';
+	import { superForm } from 'sveltekit-superforms';
+	import * as Form from '$lib/components/ui/form';
+	import { getImageURL } from '$lib/utils.js';
+	import type { User as UserTypes } from '$lib/types';
 
-	let username = 'John Doe';
-	let email = 'john.doe@example.com';
-	let avatarUrl = 'https://xsgames.co/randomusers/avatar.php?g=male';
-	let isUsernameDialogOpen = false;
-	let isEmailDialogOpen = false;
-	let newUsername = '';
-	let newEmail = '';
-	let isDarkMode = false;
-	let activeTab = 'general';
+	let {
+		data
+	}: {
+		data: {
+			user: UserTypes;
+			accountData: any;
+		};
+	} = $props();
 
-	onMount(() => {
-		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-		setTheme(prefersDark);
+	let theme = $state('system');
+	let username = $state('john doe');
+	let avatarUrl = $state('https://xsgames.co/randomusers/avatar.php?g=male');
+	let isProfileDialogOpen = $state(false);
+	let avatarPreview: string | null = $state(null);
+
+	const form = superForm(data.accountData, {
+		validators: zodClient(updateProfileSchema),
+		onUpdated: ({ form }) => {
+			if (form.message) {
+				if (form.message.type == 'error') {
+					toast.error(form.message.text);
+				} else {
+					isProfileDialogOpen = false;
+					toast.success(form.message.text);
+				}
+			}
+		}
 	});
 
-	function setTheme(dark: boolean) {
-		isDarkMode = dark;
-		document.documentElement.classList.toggle('dark', dark);
-	}
+	const { enhance, delayed, form: formData, message } = form;
 
-	function handleAvatarUpload(event: Event) {
+	const handleAvatarUpload = async (event: Event) => {
 		const file = (event.target as HTMLInputElement).files?.[0];
+		console.log(file);
+
 		if (file) {
-			const reader = new FileReader();
-			reader.onload = (e) => {
-				avatarUrl = e.target?.result as string;
-				toast.success('Profile picture updated successfully!');
+			let render = new FileReader();
+
+			render.onload = (e) => {
+				avatarPreview = e.target?.result as string;
+				toast.success('Profile updated successfuly');
 			};
-			reader.readAsDataURL(file);
+
+			render.readAsDataURL(file);
+
+			$formData.avatar = file;
 		}
+	};
+
+	$effect(() => {
+		applyTheme(theme);
+		theme;
+	});
+
+	onMount(() => {
+		const savedTheme = localStorage.getItem('theme') || 'system';
+		theme = savedTheme;
+	});
+
+	function applyTheme(selectedTheme: string) {
+		const root = document.documentElement;
+		if (
+			selectedTheme === 'dark' ||
+			(selectedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
+		) {
+			root.classList.add('dark');
+		} else {
+			root.classList.remove('dark');
+		}
+		localStorage.setItem('theme', selectedTheme);
 	}
 
-	function handleUsernameSubmit() {
-		username = newUsername;
-		isUsernameDialogOpen = false;
-		toast.success('Username updated successfully!');
+	function setTheme(newTheme: 'light' | 'dark' | 'system') {
+		theme = newTheme;
+		applyTheme(newTheme);
+		toast.success(`Theme set to ${newTheme} mode`);
 	}
 
-	function handleEmailSubmit() {
-		email = newEmail;
-		isEmailDialogOpen = false;
-		toast.success('Email updated successfully!');
-	}
+	$formData.name = data.user.name;
 
-	const tabs = [
-		{ id: 'general', label: 'General', icon: User },
-		{ id: 'security', label: 'Security', icon: Shield },
-		{ id: 'notifications', label: 'Notifications', icon: Bell }
-	];
+	$effect(() => {
+		if ($message?.type && $message?.type === 'success') {
+			isProfileDialogOpen = false;
+		}
+	});
 </script>
 
-<div class="container mx-auto max-w-4xl p-6">
+<div class="mx-auto max-w-4xl p-3">
 	<Card.Root class="bg-background">
-		<Card.Header>
-			<div class="flex items-center justify-between">
+		<Card.Header class="flex flex-row items-center justify-between">
+			<div>
 				<Card.Title class="text-3xl font-bold">Account Settings</Card.Title>
-				<Button variant="ghost" size="icon" onclick={() => setTheme(!isDarkMode)}>
-					{#if isDarkMode}
-						<Sun class="h-5 w-5" />
-					{:else}
-						<Moon class="h-5 w-5" />
-					{/if}
-				</Button>
+				<Card.Description>Manage your account information and preferences</Card.Description>
 			</div>
-			<Card.Description>Manage your account information and preferences</Card.Description>
+			<DropdownMenu.Root>
+				<DropdownMenu.Trigger>
+					<Button variant="outline" size="icon">
+						<Sun
+							class="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
+						/>
+						<Moon
+							class="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100"
+						/>
+						<span class="sr-only">Toggle theme</span>
+					</Button>
+				</DropdownMenu.Trigger>
+				<DropdownMenu.Content align="end">
+					<DropdownMenu.Item onclick={() => setTheme('light')}>
+						<Sun class="mr-2 h-4 w-4" />
+						<span>Light</span>
+					</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => setTheme('dark')}>
+						<Moon class="mr-2 h-4 w-4" />
+						<span>Dark</span>
+					</DropdownMenu.Item>
+					<DropdownMenu.Item onclick={() => setTheme('system')}>
+						<Laptop class="mr-2 h-4 w-4" />
+						<span>System</span>
+					</DropdownMenu.Item>
+				</DropdownMenu.Content>
+			</DropdownMenu.Root>
 		</Card.Header>
 		<Card.Content>
 			<div class="mb-8 flex items-center space-x-6">
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div class="relative">
 					<Avatar.Root class="h-24 w-24">
-						<Avatar.Image src={avatarUrl} alt={username} />
-						<Avatar.Fallback>{username.charAt(0)}</Avatar.Fallback>
+						<Avatar.Image
+							src={data.user.avatar
+								? getImageURL(data.user?.collectionId, data.user?.id, data.user?.avatar)
+								: avatarUrl}
+							alt={username}
+						/>
+						<Avatar.Fallback>{data.user.name}</Avatar.Fallback>
 					</Avatar.Root>
-					<label
-						for="avatar-upload"
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<div
+						onclick={() => (isProfileDialogOpen = true)}
 						class="bg-primary text-primary-foreground hover:bg-primary/90 absolute bottom-0 right-0 cursor-pointer rounded-full p-2 transition-colors"
 					>
 						<Camera class="h-4 w-4" />
-					</label>
-					<input
-						id="avatar-upload"
-						type="file"
-						accept="image/*"
-						class="hidden"
-						on:change={handleAvatarUpload}
-					/>
+					</div>
 				</div>
 				<div>
-					<h2 class="text-2xl font-semibold">{username}</h2>
+					<h2 class="text-2xl font-semibold">{data.user.name} ({data.user.username})</h2>
 					<p class="text-muted-foreground">Member since January 1, 2023</p>
 				</div>
 			</div>
-
-			<Tabs.Root value={activeTab} class="w-full" onValueChange={(value) => (activeTab = value)}>
-				<Tabs.List class="grid w-full grid-cols-3 gap-4">
-					{#each tabs as tab}
-						<Tabs.Trigger value={tab.id} class="flex items-center justify-center space-x-2">
-							<svelte:component this={tab.icon} class="h-4 w-4" />
-							<span>{tab.label}</span>
-						</Tabs.Trigger>
-					{/each}
+			<div class="my-8 flex w-full justify-end">
+				<Button
+					class="flex w-fit justify-end rounded-sm p-4 shadow"
+					onclick={() => (isProfileDialogOpen = true)}
+				>
+					Change Profile
+				</Button>
+			</div>
+			<Tabs.Root class="w-full">
+				<Tabs.List class="mx-auto grid w-full grid-cols-3 ">
+					<Tabs.Trigger value="account" class="data-[state=active]:bg-muted">
+						<Mail class="mr-2 h-4 w-4" />
+						Account</Tabs.Trigger
+					>
+					<Tabs.Trigger value="security" class="data-[state=active]:bg-muted">
+						<Shield class="mr-2 h-4 w-4" />
+						Security</Tabs.Trigger
+					>
+					<Tabs.Trigger value="danger" class="data-[state=active]:bg-muted">
+						<LogOut class="mr-2 h-4 w-4" />
+						Danger</Tabs.Trigger
+					>
 				</Tabs.List>
-				<div class="mt-6">
-					<Tabs.Content value="general" class="space-y-6">
-						<div class="grid gap-4 md:grid-cols-2">
-							<div class="space-y-2">
-								<Label for="username">Username</Label>
-								<div class="flex items-center space-x-2">
-									<Input id="username" value={username} readonly />
-									<Button onclick={() => (isUsernameDialogOpen = true)}>Change</Button>
-								</div>
-							</div>
-							<div class="space-y-2">
-								<Label for="email">Email</Label>
-								<div class="flex items-center space-x-2">
-									<Input id="email" value={email} readonly />
-									<Button onclick={() => (isEmailDialogOpen = true)}>Change</Button>
-								</div>
-							</div>
-						</div>
-					</Tabs.Content>
-					<Tabs.Content value="security" class="space-y-6">
-						<div class="grid gap-4 md:grid-cols-2">
-							<div class="space-y-2">
-								<Label for="password">Password</Label>
-								<div class="flex items-center space-x-2">
-									<Input id="password" type="password" value="********" readonly />
-									<Button>Change</Button>
-								</div>
-							</div>
-							<div class="space-y-2">
-								<Label for="2fa">Two-Factor Authentication</Label>
-								<Button variant="outline" class="w-full justify-start">
-									<Shield class="mr-2 h-4 w-4" />
-									Enable 2FA
-								</Button>
-							</div>
-						</div>
-					</Tabs.Content>
-					<Tabs.Content value="notifications" class="space-y-6">
-						<div class="grid gap-4 md:grid-cols-2">
-							<div class="space-y-2">
-								<Label>Email Notifications</Label>
-								<Button variant="outline" class="w-full justify-start">
-									<Mail class="mr-2 h-4 w-4" />
-									Manage Email Preferences
-								</Button>
-							</div>
-							<div class="space-y-2">
-								<Label>Push Notifications</Label>
-								<Button variant="outline" class="w-full justify-start">
-									<Smartphone class="mr-2 h-4 w-4" />
-									Manage Push Notifications
-								</Button>
-							</div>
-						</div>
-					</Tabs.Content>
-				</div>
+				<Tabs.Content value="account">Make changes to your account here.</Tabs.Content>
+				<Tabs.Content value="security">Change your password here.</Tabs.Content>
 			</Tabs.Root>
 		</Card.Content>
 	</Card.Root>
 </div>
 
-<Dialog.Root bind:open={isUsernameDialogOpen}>
+
+
+<Dialog.Root bind:open={isProfileDialogOpen}>
 	<Dialog.Content class="sm:max-w-[425px]">
 		<Dialog.Header>
-			<Dialog.Title>Change Username</Dialog.Title>
-			<Dialog.Description>
-				Enter your new username below. Click save when you're done.
-			</Dialog.Description>
+			<Dialog.Title>Update profile</Dialog.Title>
+			<Dialog.Description>Update name and avatar</Dialog.Description>
 		</Dialog.Header>
-		<form on:submit|preventDefault={handleUsernameSubmit}>
-			<div class="grid gap-4 py-4">
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="new-username" class="text-right">Username</Label>
-					<Input id="new-username" bind:value={newUsername} class="col-span-3" />
+		<form action="?/updateProfile" enctype="multipart/form-data" method="post" use:enhance>
+			<div class="relative flex flex-col gap-4">
+				<Avatar.Root class="h-32 w-32">
+					<Avatar.Image
+						src={avatarPreview ||
+							(data.user.avatar &&
+								getImageURL(data.user.collectionId, data.user.id, data.user.avatar))}
+						alt="Avatar Preview"
+					/>
+					<Avatar.Fallback>{data.user.name.charAt(0)}</Avatar.Fallback>
+				</Avatar.Root>
+				<Label for="new-avatar" class="absolute h-32 w-32 cursor-pointer">
+					<Input
+						id="new-avatar"
+						name="avatar"
+						type="file"
+						accept="image/*"
+						onchange={handleAvatarUpload}
+						class="h-100 w-100 hidden cursor-pointer"
+					/>
+				</Label>
+			</div>
+			<div class="space-y-4">
+				<div class="grid gap-2">
+					<Form.Field {form} name="name">
+						<Form.Control>
+							{#snippet children({ props })}
+								<Form.Label>Name</Form.Label>
+								<Input
+									{...props}
+									placeholder={data.user.name}
+									type="text"
+									contenteditable="true"
+									bind:value={$formData.name}
+								/>
+							{/snippet}
+						</Form.Control>
+						<Form.Description />
+						<Form.FieldErrors />
+					</Form.Field>
 				</div>
 			</div>
-			<Dialog.Footer>
-				<Button type="submit">Save changes</Button>
-			</Dialog.Footer>
+
+			<div class="flex justify-end">
+				{#if $delayed}
+					<Loader class="size-4 animate-spin" />
+				{:else}
+					<Button type="submit">Change Profile</Button>
+				{/if}
+			</div>
 		</form>
 	</Dialog.Content>
 </Dialog.Root>
-
-<Dialog.Root bind:open={isEmailDialogOpen}>
-	<Dialog.Content class="sm:max-w-[425px]">
-		<Dialog.Header>
-			<Dialog.Title>Change Email</Dialog.Title>
-			<Dialog.Description>
-				Enter your new email address below. Click save when you're done.
-			</Dialog.Description>
-		</Dialog.Header>
-		<form on:submit|preventDefault={handleEmailSubmit}>
-			<div class="grid gap-4 py-4">
-				<div class="grid grid-cols-4 items-center gap-4">
-					<Label for="new-email" class="text-right">Email</Label>
-					<Input id="new-email" type="email" bind:value={newEmail} class="col-span-3" />
-				</div>
-			</div>
-			<Dialog.Footer>
-				<Button type="submit">Save changes</Button>
-			</Dialog.Footer>
-		</form>
-	</Dialog.Content>
-</Dialog.Root>
-

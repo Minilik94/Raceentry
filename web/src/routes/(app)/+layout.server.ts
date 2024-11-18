@@ -1,4 +1,5 @@
 import type { LayoutServerLoad } from './$types';
+import { redirect } from '@sveltejs/kit'
 
 export const load = (async ({ locals }) => {
 	if (locals.user) {
@@ -6,7 +7,5 @@ export const load = (async ({ locals }) => {
 			user: locals.user
 		};
 	}
-	return {
-		user: undefined
-	};
+	throw redirect(303, '/login')
 }) satisfies LayoutServerLoad;

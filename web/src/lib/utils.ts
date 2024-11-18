@@ -37,3 +37,7 @@ export const validateData = async (
 		};
 	}
 };
+
+export const getImageURL = (collectionId: any, recordId: any, fileName: any, size = '0x0') => {
+	return `http://localhost:8090/api/files/${collectionId}/${recordId}/${fileName}?thumb=${size}`;
+};

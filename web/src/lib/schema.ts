@@ -72,3 +72,40 @@ export const registerSchema = z
 			});
 		}
 	});
+
+const imageTypes = [
+	'image/jpeg',
+	'image/jpg',
+	'image/png',
+	'image/webp',
+	'image/svg+xml',
+	'image/gif'
+];
+
+export const updateProfileSchema = z.object({
+	name: z
+		.string({ required_error: 'Name is required' })
+		.min(1, { message: 'Name is required' })
+		.max(64, { message: 'Name must be 64 characters or less' })
+		.trim(),
+	avatar: z
+		.instanceof(Blob)
+		.optional()
+		.superRefine((val, ctx) => {
+			if (val) {
+				if (val.size > 5242880) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'Avatar must be less than 5MB'
+					});
+				}
+
+				if (!imageTypes.includes(val.type)) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'Unsupported file type. Supported formats: jpeg, jpg, png, webp, svg, gif'
+					});
+				}
+			}
+		})
+});

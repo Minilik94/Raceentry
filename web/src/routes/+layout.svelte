@@ -1,4 +1,5 @@
 <script lang="ts">
+	import "@fontsource/goldman"
 	import '../app.css';
 	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';

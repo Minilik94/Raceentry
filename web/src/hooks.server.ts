@@ -21,7 +21,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	response.headers.set('set-cookie', event.locals.pb.authStore.exportToCookie({ secure: false }));
 
-	console.log(event.locals.user, event.url.pathname);
 	if (event.url.pathname.startsWith('/(app)')) {
 		console.log('Redirecting');
 	}

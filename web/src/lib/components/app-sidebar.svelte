@@ -5,11 +5,8 @@
 	import RegistrationsIcon from 'lucide-svelte/icons/file-text';
 	import SettingsIcon from 'lucide-svelte/icons/settings';
 	import Menu from 'lucide-svelte/icons/menu';
-	import Sun from 'lucide-svelte/icons/sun';
-	import Moon from 'lucide-svelte/icons/moon';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
-	import { mode, toggleMode } from 'mode-watcher';
 	import { Logo } from '.';
 
 	// Define items for different roles
@@ -79,16 +76,6 @@
 					>
 					<DropdownMenu.Item class="flex cursor-pointer items-center gap-2 p-3">
 						<ReportsIcon /> Projects
-					</DropdownMenu.Item>
-					<DropdownMenu.Item
-						onclick={toggleMode}
-						class="flex cursor-pointer items-center gap-2 p-3"
-					>
-						{#if $mode === 'dark'}
-							<Sun /> Light mode
-						{:else}
-							<Moon /> Dark mode
-						{/if}
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator class="h-2" />
 					<DropdownMenu.Item class="p-3">

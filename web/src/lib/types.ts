@@ -6,6 +6,7 @@ export interface User {
 	email: string;
 	emailVisibility: boolean;
 	id: string;
+	licence_number: string;
 	name: string;
 	role: [Array<string>];
 	updated: string;
