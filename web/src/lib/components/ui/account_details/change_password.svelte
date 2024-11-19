@@ -53,7 +53,7 @@
 				<Form.FieldErrors />
 			</Form.Field>
 		</div>
-		<Button type="submit" class="w-full">
+		<Button type="submit" class="w-full" disabled={$formPass.currentPassword.length == 0}>
 			{#if $delayedPass}
 				<Loader class="size-4 animate-spin" />
 			{:else}
