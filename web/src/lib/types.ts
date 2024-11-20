@@ -13,3 +13,24 @@ export interface User {
 	username: string;
 	verified: boolean;
 }
+
+export interface Event {
+	id: string;
+	name: string;
+	avatar: string;
+	description: string;
+	location: string;
+	layout: string;
+	date: string;
+	cost: number;
+	approx_number_of_cars: number;
+	format: string;
+	natsoft_timing: boolean;
+	sessions: string;
+	eligible_cars: string;
+	second_driver_policy: string;
+	passenger_policy: string;
+	aasa_license: boolean;
+	engine_requirement: boolean;
+	additional_infos: string;
+}

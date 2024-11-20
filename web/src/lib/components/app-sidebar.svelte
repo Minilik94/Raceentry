@@ -13,7 +13,7 @@
 	const adminItems = [
 		{ title: 'Dashboard', url: '#', icon: DashboardIcon },
 		{ title: 'Users', url: '#', icon: UsersIcon },
-		{ title: 'Events', url: '#', icon: EventsIcon },
+		{ title: 'Events', url: '/events', icon: EventsIcon },
 		{ title: 'Registrations', url: '#', icon: RegistrationsIcon },
 		{ title: 'Reports', url: '#', icon: ReportsIcon },
 		{ title: 'Settings', url: '#', icon: SettingsIcon }
@@ -25,7 +25,7 @@
 		{ title: 'Registrations', url: '/registrations', icon: RegistrationsIcon }
 	];
 
-	let role = 'user';
+	let role = 'admin';
 
 	// Determine items to display based on role
 	let items = role === 'admin' ? adminItems : userItems;

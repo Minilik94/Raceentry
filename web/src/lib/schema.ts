@@ -169,3 +169,72 @@ export const updatePasswordSchema = z
 			});
 		}
 	});
+
+export const createEventSchema = z.object({
+	name: z
+		.string({ required_error: 'Name is required' })
+		.min(1, { message: 'Name is required' })
+		.max(64, { message: 'Name must be 64 characters or less' })
+		.trim(),
+	avatar: z
+		.instanceof(Blob)
+		.optional()
+		.superRefine((val, ctx) => {
+			if (val) {
+				if (val.size > 5 * 1024 * 1024) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'Avatar must be less than 5MB'
+					});
+				}
+				if (!imageTypes.includes(val.type)) {
+					ctx.addIssue({
+						code: z.ZodIssueCode.custom,
+						message: 'Unsupported file type. Supported formats: jpeg, jpg, png, webp, svg, gif'
+					});
+				}
+			}
+		}),
+	description: z
+		.string()
+		.max(256, { message: 'Description must be 256 characters or less' })
+		.trim(),
+	location: z
+		.string()
+		.min(1, { message: 'Location is required' })
+		.max(128, { message: 'Location must be 128 characters or less' }),
+	layout: z
+		.string()
+		.min(1, { message: 'Layout is required' })
+		.max(64, { message: 'Layout must be 64 characters or less' }),
+	date: z.string().or(z.date()).default("2024-01-12"),
+	cost: z.number().nonnegative({ message: 'Cost must be a positive number' }),
+	approx_number_of_cars: z
+		.number()
+		.int()
+		.min(1, { message: 'Approximate number of cars must be at least 1' }),
+	format: z
+		.string()
+		.min(1, { message: 'Format is required' })
+		.max(64, { message: 'Format must be 64 characters or less' }),
+	natsoft_timing: z.boolean(),
+	sessions: z
+		.string()
+		.min(1, { message: 'Sessions are required' })
+		.max(128, { message: 'Sessions must be 128 characters or less' }),
+	eligible_cars: z
+		.string()
+		.min(1, { message: 'Eligible cars is required' })
+		.max(128, { message: 'Eligible cars must be 128 characters or less' }),
+	second_driver_policy: z
+		.string()
+		.min(1, { message: 'Second driver policy is required' })
+		.max(64, { message: 'Second driver policy must be 64 characters or less' }),
+	passenger_policy: z
+		.string()
+		.min(1, { message: 'Passenger policy is required' })
+		.max(64, { message: 'Passenger policy must be 64 characters or less' }),
+	aasa_license: z.boolean(),
+	engine_requirement: z.boolean(),
+	additional_infos: z.string().min(1, { message: 'Additional infos is required' }).trim().optional()
+});
