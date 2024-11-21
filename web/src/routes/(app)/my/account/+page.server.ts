@@ -130,6 +130,5 @@ export const actions: Actions = {
 	},
 
 	addVehicle: async ({ request, locals }) => {
-		
 	}
 };

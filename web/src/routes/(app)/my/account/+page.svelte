@@ -40,45 +40,23 @@
 
 	const dispatch = createEventDispatcher();
 
-	const form = superForm(data.accountData, {
-		validators: zodClient(updateProfileSchema),
-		onUpdated: ({ form }) => {
-			if (form.message) {
-				if (form.message.type == 'error') {
-					toast.error(form.message.text);
-				} else {
-					handleProfileDialogChange(false);
-					toast.success(form.message.text);
-				}
-			}
-		}
-	});
+	// const form = superForm(data.accountData, {
+	// 	validators: zodClient(updateProfileSchema),
+	// 	onUpdated: ({ form }) => {
+	// 		if (form.message) {
+	// 			if (form.message.type == 'error') {
+	// 				toast.error(form.message.text);
+	// 			} else {
+	// 				handleProfileDialogChange(false);
+	// 				toast.success(form.message.text);
+	// 			}
+	// 		}
+	// 	}
+	// });
 
-	const accountForm = superForm(data.profileData, {
-		validators: zodClient(updateAccountSchema),
-		onUpdated: ({ form }) => {
-			if (form.message) {
-				if (form.message.type == 'error') {
-					toast.error(form.message.text);
-				} else {
-					toast.success(form.message.text);
-				}
-			}
-		}
-	});
-	const passwordForm = superForm(data.passwordData, {
-		validators: zodClient(updatePasswordSchema),
-		onUpdated: ({ form }) => {
-			if (form.message) {
-				if (form.message.type == 'error') {
-					toast.error(form.message.text);
-				} else {
-					console.log(form.message.text, 'form message');
-					toast.success(form.message.text);
-				}
-			}
-		}
-	});
+	const form = hanldeSuperForm(data.accountData, updateProfileSchema, "profile")
+	const accountForm = hanldeSuperForm(data.profileData, updateAccountSchema, 'account');
+	const passwordForm = hanldeSuperForm(data.passwordData, updatePasswordSchema, 'password');
 
 	const { enhance, form: formData, message } = form;
 
@@ -104,13 +82,6 @@
 		}
 
 		localStorage.setItem('theme', selectedTheme);
-	}
-
-	function setTheme(newTheme: 'light' | 'dark' | 'system') {
-		theme = newTheme;
-		applyTheme(newTheme);
-		toast.success(`Theme set to ${newTheme} mode`);
-		localStorage.setItem('theme', theme);
 	}
 
 	$formData.name = data.user.name;

@@ -46,8 +46,15 @@ export const getImageURL = (collectionId: any, recordId: any, fileName: any, siz
 	return `http://localhost:8090/api/files/${collectionId}/${recordId}/${fileName}?thumb=${size}`;
 };
 
+/**
+ * Helper function to create a superForm with common behaviors.
+ * @param {Object} data - The data for the form.
+ * @param {Object} schema - The Zod schema for validation.
+ * @param {Function} [onSuccess] - Optional callback for success handling.
+ * @returns {Object} The superForm instance.
+ **/
+
 export const hanldeSuperForm = (data, schema, type) => {
-	console.log(data, 'data', 'schema', schema, 'type', type, 'type');
 	return superForm(data, {
 		validators: zodClient(schema),
 		onUpdated: ({ form }) => {
