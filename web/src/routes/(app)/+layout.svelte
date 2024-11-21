@@ -2,12 +2,12 @@
 	import { AppSidebar } from '$lib/components';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Toaster } from 'svelte-sonner';
-	let { children } = $props();
+	let { children, data } = $props();
 </script>
 
 <Toaster richColors position="top-right" />
 <Sidebar.Provider>
-	<AppSidebar />
+	<AppSidebar {data} />
 	<main class="w-full">
 		<Sidebar.Trigger />
 		<div class="">

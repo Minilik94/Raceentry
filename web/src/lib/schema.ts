@@ -207,7 +207,7 @@ export const createEventSchema = z.object({
 		.string()
 		.min(1, { message: 'Layout is required' })
 		.max(64, { message: 'Layout must be 64 characters or less' }),
-	date: z.string().or(z.date()).default("2024-01-12"),
+	date: z.string().or(z.date()).default('2024-01-12'),
 	cost: z.number().nonnegative({ message: 'Cost must be a positive number' }),
 	approx_number_of_cars: z
 		.number()
@@ -237,4 +237,14 @@ export const createEventSchema = z.object({
 	aasa_license: z.boolean(),
 	engine_requirement: z.boolean(),
 	additional_infos: z.string().min(1, { message: 'Additional infos is required' }).trim().optional()
+});
+
+export const addVehicleSchema = z.object({
+	car_year: z.string().min(1, { message: 'Car year is required' }),
+	car_make: z.string().min(1, { message: 'Car make is required' }),
+	car_model: z.string().min(1, { message: 'Car model is required' }),
+	car_colour: z.string().min(1, { message: 'Car colour is required' }),
+	drivetrain_layout: z.string().min(1, { message: 'Drivetrain layout is required' }),
+	induction: z.string().min(1, { message: 'Induction is required' }),
+	tyre_treadwear: z.string().min(1, { message: 'Tyre treadwear is required' })
 });

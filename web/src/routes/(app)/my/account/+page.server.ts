@@ -127,5 +127,9 @@ export const actions: Actions = {
 			text: 'Successfuly  updated your password',
 			type: 'success'
 		});
+	},
+
+	addVehicle: async ({ request, locals }) => {
+		
 	}
 };

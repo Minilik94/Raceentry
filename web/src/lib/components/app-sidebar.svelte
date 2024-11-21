@@ -11,7 +11,7 @@
 
 	// Define items for different roles
 	const adminItems = [
-		{ title: 'Dashboard', url: '#', icon: DashboardIcon },
+		{ title: 'Dashboard', url: '/', icon: DashboardIcon },
 		{ title: 'Users', url: '#', icon: UsersIcon },
 		{ title: 'Events', url: '/events', icon: EventsIcon },
 		{ title: 'Registrations', url: '#', icon: RegistrationsIcon },
@@ -25,7 +25,9 @@
 		{ title: 'Registrations', url: '/registrations', icon: RegistrationsIcon }
 	];
 
-	let role = 'admin';
+	let { data } = $props();
+
+	let role = $state(data?.user?.role[0]);
 
 	// Determine items to display based on role
 	let items = role === 'admin' ? adminItems : userItems;

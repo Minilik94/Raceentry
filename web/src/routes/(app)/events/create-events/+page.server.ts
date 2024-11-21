@@ -2,9 +2,12 @@ import { message, superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
 import { zod } from 'sveltekit-superforms/adapters';
 import { createEventSchema } from '$lib/schema';
-import { error } from '@sveltejs/kit';
+import { error, redirect } from '@sveltejs/kit';
 
-export const load = (async ({}) => {
+export const load = (async ({ locals }) => {
+	if (locals.user.role !== 'admin') {
+		throw redirect(303, '/events');
+	}
 	const form = await superValidate(zod(createEventSchema));
 	return {
 		form
@@ -23,13 +26,12 @@ export const actions: Actions = {
 			});
 		}
 
-		if(form.data.avatar?.size == 0) {
+		if (form.data.avatar?.size == 0) {
 			form.data.avatar = undefined;
 		}
 
 		try {
-			await locals.pb.collection('events').create(form?.data)
-
+			await locals.pb.collection('events').create(form?.data);
 		} catch (err) {
 			console.log('Error: ', err);
 

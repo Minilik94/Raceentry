@@ -4,6 +4,7 @@ import { superForm } from 'sveltekit-superforms';
 import { zodClient } from 'sveltekit-superforms/adapters';
 import { twMerge } from 'tailwind-merge';
 import type { ZodObject, ZodString, ZodTypeAny } from 'zod';
+import dayjs from 'dayjs';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -59,4 +60,9 @@ export const hanldeSuperForm = (data, schema, type) => {
 			}
 		}
 	});
+};
+
+export const formatDate = (date) => {
+	const parsedDate = dayjs(date);
+	return parsedDate.isValid() ? parsedDate.format('DD MMM YYYY') : 'Invalid Date';
 };
