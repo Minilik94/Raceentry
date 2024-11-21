@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher } from 'svelte';
+	import { createEventDispatcher, onMount } from 'svelte';
 	import * as Dialog from '$lib/components/ui/dialog';
 	import * as Form from '$lib/components/ui/form';
 	import { Button } from '$lib/components/ui/button';
@@ -11,6 +11,9 @@
 	import { toast } from 'svelte-sonner';
 
 	let { data, form, isOpen } = $props();
+
+	let name = $state(data.user.name);
+	let avatar = $state(data.user.avatar);
 
 	const dispatch = createEventDispatcher();
 
@@ -33,6 +36,14 @@
 			$formData.avatar = file;
 		}
 	};
+
+	$effect(() => {
+		name = data.user.name;
+		console.log(name, avatar, 'name', 'avatar');
+		$formData.name = name;
+	});
+
+
 
 	const handleProfileDialogChange = (open: boolean) => {
 		dispatch('profileDialogChange', { open });

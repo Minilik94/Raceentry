@@ -6,6 +6,9 @@
 
 	let { data, accountForm } = $props();
 
+	let email = $state(data.user.email);
+	let username = $state(data.user.username);
+
 	const {
 		enhance: enhanceAccount,
 		delayed: accountDelayed,
@@ -14,8 +17,13 @@
 		errors: accountErrors
 	} = accountForm;
 
-	$accountFormData.email = data.user.email;
-	$accountFormData.username = data.user.username;
+	$effect(() => {
+		console.log('data', data);
+		email = data.user.email;
+		username = data.user.username;
+		$accountFormData.email = email;
+		$accountFormData.username = username;
+	});
 </script>
 
 <form action="?/updateAccount" method="POST" use:enhanceAccount>

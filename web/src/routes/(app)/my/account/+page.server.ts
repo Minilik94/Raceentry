@@ -88,6 +88,7 @@ export const actions: Actions = {
 			throw error(400, 'Something went wrong updating your account details');
 		}
 
+		console.log(form, 'after success', locals.user.email, locals.user.username)
 		return message(form, {
 			text: 'Successfuly  updated your account',
 			type: 'success'

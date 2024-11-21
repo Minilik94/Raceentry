@@ -36,7 +36,7 @@
 
 	const dispatch = createEventDispatcher();
 
-	const form = hanldeSuperForm(data.accountData, updateProfileSchema, "profile")
+	const form = hanldeSuperForm(data.accountData, updateProfileSchema, 'profile');
 	const accountForm = hanldeSuperForm(data.profileData, updateAccountSchema, 'account');
 	const passwordForm = hanldeSuperForm(data.passwordData, updatePasswordSchema, 'password');
 
@@ -66,6 +66,10 @@
 		localStorage.setItem('theme', selectedTheme);
 	}
 
+	// $derived(() => {
+	// 	console.log("after update main acc", avatarUrl, $formData.name, $formData.email, data.user.username, data.user.email);
+
+	// })
 	$formData.name = data.user.name;
 
 	$effect(() => {
