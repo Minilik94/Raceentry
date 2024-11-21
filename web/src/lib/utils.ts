@@ -54,7 +54,7 @@ export const getImageURL = (collectionId: any, recordId: any, fileName: any, siz
  * @returns {Object} The superForm instance.
  **/
 
-export const hanldeSuperForm = (data, schema, type) => {
+export const handleSuperForm = (data, schema, type) => {
 	return superForm(data, {
 		validators: zodClient(schema),
 		onUpdated: ({ form }) => {

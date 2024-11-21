@@ -22,6 +22,7 @@
 	const userItems = [
 		{ title: 'Dashboard', url: '/', icon: DashboardIcon },
 		{ title: 'Events', url: '/events', icon: EventsIcon },
+		{ title: 'Vehicles', url: '/vehicles', icon: EventsIcon },
 		{ title: 'Registrations', url: '/registrations', icon: RegistrationsIcon }
 	];
 

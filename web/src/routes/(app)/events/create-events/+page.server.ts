@@ -5,7 +5,7 @@ import { createEventSchema } from '$lib/schema';
 import { error, redirect } from '@sveltejs/kit';
 
 export const load = (async ({ locals }) => {
-	if (locals.user.role !== 'admin') {
+	if (locals.user.role[0] !== 'admin') {
 		throw redirect(303, '/events');
 	}
 	const form = await superValidate(zod(createEventSchema));

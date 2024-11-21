@@ -6,8 +6,8 @@
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import { updateProfileSchema, updateAccountSchema, updatePasswordSchema } from '$lib/schema.js';
-	import { getImageURL, hanldeSuperForm } from '$lib/utils.js';
+	import { updateProfileSchema, updateAccountSchema, updatePasswordSchema } from '$lib/schema';
+	import { getImageURL, handleSuperForm } from '$lib/utils.js';
 	import type { User as UserTypes } from '$lib/types';
 	import {
 		ChangeEmailAndUsername,
@@ -17,6 +17,7 @@
 		ThemeDropdown
 	} from '$lib/components/ui/account_details';
 	import { browser } from '$app/environment';
+	import AddNewVehicle from '$lib/components/ui/vehicle_details';
 
 	let {
 		data
@@ -36,9 +37,9 @@
 
 	const dispatch = createEventDispatcher();
 
-	const form = hanldeSuperForm(data.accountData, updateProfileSchema, 'profile');
-	const accountForm = hanldeSuperForm(data.profileData, updateAccountSchema, 'account');
-	const passwordForm = hanldeSuperForm(data.passwordData, updatePasswordSchema, 'password');
+	const form = handleSuperForm(data.accountData, updateProfileSchema, 'profile');
+	const accountForm = handleSuperForm(data.profileData, updateAccountSchema, 'account');
+	const passwordForm = handleSuperForm(data.passwordData, updatePasswordSchema, 'password');
 
 	const { enhance, form: formData, message } = form;
 
@@ -66,10 +67,6 @@
 		localStorage.setItem('theme', selectedTheme);
 	}
 
-	// $derived(() => {
-	// 	console.log("after update main acc", avatarUrl, $formData.name, $formData.email, data.user.username, data.user.email);
-
-	// })
 	$formData.name = data.user.name;
 
 	$effect(() => {
@@ -128,7 +125,7 @@
 				</Button>
 			</div>
 			<Tabs.Root class="w-full" value="account">
-				<Tabs.List class="mx-auto grid w-full grid-cols-3 ">
+				<Tabs.List class="mx-auto grid w-full grid-cols-3 lg:grid-cols-3">
 					<Tabs.Trigger value="account" class="data-[state=active]:bg-muted">
 						<Mail class="mr-2 h-4 w-4" />
 						Account

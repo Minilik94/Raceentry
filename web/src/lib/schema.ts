@@ -240,11 +240,41 @@ export const createEventSchema = z.object({
 });
 
 export const addVehicleSchema = z.object({
-	car_year: z.string().min(1, { message: 'Car year is required' }),
+	car_year: z
+		.number({
+			required_error: 'Car year is required',
+			invalid_type_error: 'Car year must be a number'
+		})
+		.min(1, {
+			message: 'Car year must be at least 4 digits'
+		}),
 	car_make: z.string().min(1, { message: 'Car make is required' }),
 	car_model: z.string().min(1, { message: 'Car model is required' }),
 	car_colour: z.string().min(1, { message: 'Car colour is required' }),
 	drivetrain_layout: z.string().min(1, { message: 'Drivetrain layout is required' }),
 	induction: z.string().min(1, { message: 'Induction is required' }),
 	tyre_treadwear: z.string().min(1, { message: 'Tyre treadwear is required' })
+});
+
+export const updateRegisteredUserSchema = z.object({
+	licence_number: z.string().min(1, { message: 'License number is required.' }),
+	first_name: z.string().min(1, { message: 'First name is required.' }),
+
+	last_name: z.string().min(1, { message: 'Last name is required.' }),
+
+	mobile: z.string().min(1, { message: 'Mobile number is required.' }),
+
+	emergency_contact: z.string().min(1, { message: 'Emergency contact is required.' }),
+
+	address: z.string().min(1, { message: 'Address is required.' }),
+
+	postal_code: z.string().min(1, { message: 'Postal code is required.' }),
+
+	aasa_license_id: z.string().min(1, { message: 'AASA license ID is required.' }),
+
+	license_number: z.string().min(1, { message: 'License number is required.' }),
+
+	license_expiry: z.string().refine((date) => !isNaN(Date.parse(date)), {
+		message: 'License expiry must be a valid date.'
+	})
 });

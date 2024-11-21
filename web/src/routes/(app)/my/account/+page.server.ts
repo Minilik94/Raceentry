@@ -1,6 +1,11 @@
 import { message, superValidate } from 'sveltekit-superforms';
 import type { Actions, PageServerLoad } from './$types';
-import { updateAccountSchema, updatePasswordSchema, updateProfileSchema } from '$lib/schema';
+import {
+	updateAccountSchema,
+	updatePasswordSchema,
+	updateProfileSchema,
+	updateRegisteredUserSchema
+} from '$lib/schema';
 import { zod } from 'sveltekit-superforms/adapters';
 import { error, fail } from '@sveltejs/kit';
 // import { serialize } from 'object-to-formdata';
@@ -12,7 +17,7 @@ export const load = (async ({}) => {
 	return {
 		accountData,
 		profileData,
-		passwordData
+		passwordData,
 	};
 }) satisfies PageServerLoad;
 
@@ -20,8 +25,6 @@ export const actions: Actions = {
 	updateProfile: async ({ request, locals }) => {
 		const formData = await request.formData();
 		const avatarFile = formData.get('avatar') as File | null;
-
-		console.log(formData, avatarFile?.size, 'fromdata from server');
 
 		if (avatarFile?.size === 0) {
 			formData.delete('avatar');
@@ -42,8 +45,6 @@ export const actions: Actions = {
 
 			locals.user.name = name;
 			locals.user.avatar = avatar;
-
-			console.log(name, avatar, 'name', 'avatar');
 		} catch (err) {
 			console.log('Error: ', err);
 
@@ -88,7 +89,6 @@ export const actions: Actions = {
 			throw error(400, 'Something went wrong updating your account details');
 		}
 
-		console.log(form, 'after success', locals.user.email, locals.user.username)
 		return message(form, {
 			text: 'Successfuly  updated your account',
 			type: 'success'
@@ -106,7 +106,6 @@ export const actions: Actions = {
 			});
 		}
 
-		console.log(form.data.currentPassword, form.data.password, form.data.passwordConfirm);
 		try {
 			await locals.pb.collection('users').update(locals.user.id, {
 				oldPassword: form.data.currentPassword,
@@ -130,6 +129,20 @@ export const actions: Actions = {
 		});
 	},
 
-	addVehicle: async ({ request, locals }) => {
+	updateAccountDetails: async ({ request, locals }) => {
+		const form = await superValidate(request, zod(updateRegisteredUserSchema));
+
+		if (!form.valid) {
+			console.log(form);
+			return message(form, {
+				text: 'Something went wrong',
+				type: 'error'
+			});
+		}
+
+		return message(form, {
+			text: 'Successfuly  added a new vehicle to your collection',
+			type: 'success'
+		});
 	}
 };
