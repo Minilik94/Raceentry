@@ -1,16 +1,12 @@
 <script lang="ts">
 	import { createEventDispatcher } from 'svelte';
 	import * as Card from '$lib/components/ui/card';
-	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import { Button } from '$lib/components/ui/button';
-	import { Sun, Moon, Laptop, Mail, Shield, LogOut, Camera } from 'lucide-svelte';
+	import { Mail, Shield, LogOut, Camera } from 'lucide-svelte';
 	import * as Tabs from '$lib/components/ui/tabs';
 	import { onMount } from 'svelte';
-	import { toast } from 'svelte-sonner';
 	import * as Avatar from '$lib/components/ui/avatar';
-	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { updateProfileSchema, updateAccountSchema, updatePasswordSchema } from '$lib/schema.js';
-	import { superForm } from 'sveltekit-superforms';
 	import { getImageURL, hanldeSuperForm } from '$lib/utils.js';
 	import type { User as UserTypes } from '$lib/types';
 	import {
@@ -39,20 +35,6 @@
 	let isProfileDialogOpen = $state(false);
 
 	const dispatch = createEventDispatcher();
-
-	// const form = superForm(data.accountData, {
-	// 	validators: zodClient(updateProfileSchema),
-	// 	onUpdated: ({ form }) => {
-	// 		if (form.message) {
-	// 			if (form.message.type == 'error') {
-	// 				toast.error(form.message.text);
-	// 			} else {
-	// 				handleProfileDialogChange(false);
-	// 				toast.success(form.message.text);
-	// 			}
-	// 		}
-	// 	}
-	// });
 
 	const form = hanldeSuperForm(data.accountData, updateProfileSchema, "profile")
 	const accountForm = hanldeSuperForm(data.profileData, updateAccountSchema, 'account');
