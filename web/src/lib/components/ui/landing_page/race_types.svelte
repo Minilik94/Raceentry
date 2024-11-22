@@ -57,7 +57,7 @@
 			name: 'Drag Racing',
 			icon: Truck,
 			description: 'Short-distance acceleration races',
-			color: 'bg-pink-100 text-pink-600'
+			color: 'bg-pink-100 text-brown-600'
 		},
 		{
 			id: 8,

@@ -18,13 +18,13 @@
 </script>
 
 <Dialog.Root bind:open>
-	<Dialog.Content class="sm:max-w-[600px]">
+	<Dialog.Content class="sm:max-w-[600px] no-scrollbar">
 		<Dialog.Header>
 			<Dialog.Title class="text-2xl font-bold">Add New Vehicle</Dialog.Title>
 			<Dialog.Description>Enter the details of your new racing machine.</Dialog.Description>
 		</Dialog.Header>
 		<form action="?/addNewVehicle" method="POST" use:enhanceVehicle class="mt-4">
-			<div class="grid max-h-[60vh] gap-6 overflow-y-auto px-6">
+			<div class="grid max-h-[60vh] gap-6 overflow-y-auto px-6 no-scrollbar">
 				<div class="grid grid-cols-2 gap-4">
 					<Form.Field form={vehicleForm} name="car_year">
 						<Form.Control>
@@ -156,7 +156,7 @@
 				{:else}
 					<Button
 						type="submit"
-						class="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+						class="bg-gradient-to-r from-red-600 to-amber-600 hover:from-red-700 hover:to-pink-700"
 					>
 						Add Vehicle
 					</Button>

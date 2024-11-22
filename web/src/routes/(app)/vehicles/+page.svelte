@@ -74,7 +74,7 @@
 <div class="container mx-auto space-y-12 p-4">
 	<header class="space-y-4 text-center" in:fly={{ y: -50, duration: 1000, easing: elasticOut }}>
 		<h1
-			class="bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-5xl font-extrabold text-transparent"
+			class="bg-gradient-to-r from-red-400 to-amber-600 bg-clip-text text-5xl font-extrabold text-transparent"
 		>
 			Your Racing Fleet
 		</h1>
@@ -166,7 +166,7 @@
 					</p>
 					<Button
 						size="lg"
-						class="transform bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:to-pink-700"
+						class="transform bg-gradient-to-r from-red-600 to-amber-600 transition-all duration-300 hover:scale-105 hover:from-red-700 hover:to-pink-700"
 						on:click={() => (dialogOpen = true)}
 					>
 						Add Your First Vehicle
@@ -178,7 +178,7 @@
 
 	<Button
 		size="lg"
-		class="transform bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300 hover:scale-105 hover:from-purple-700 hover:to-pink-700"
+		class="transform bg-gradient-to-r from-red-600 to-amber-600 transition-all duration-300 hover:scale-105 hover:from-red-700 hover:to-pink-700"
 		onclick={() => (dialogOpen = true)}
 	>
 		Add Your Vehicle
