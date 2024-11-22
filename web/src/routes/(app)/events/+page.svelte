@@ -72,10 +72,10 @@
 							<span>Approx. {event.approx_number_of_cars} participants</span>
 						</div>
 						<div class="flex flex-wrap gap-2 pt-2">
-							<Badge variant="secondary" class="bg-purple-100 text-purple-800">{event.format}</Badge
+							<Badge variant="secondary" class="bg-transparent">{event.format}</Badge
 							>
 							{#if event.natsoft_timing}
-								<Badge variant="secondary" class="bg-pink-100 text-brown-800">Natsoft Timing</Badge>
+								<Badge variant="secondary" class="bg-transparent">Natsoft Timing</Badge>
 							{/if}
 						</div>
 					</Card.Content>
